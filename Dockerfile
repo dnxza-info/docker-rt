@@ -117,6 +117,8 @@ RUN cpanm \
 RUN /usr/bin/mysqld_safe & sleep 10s \
 && echo "CREATE DATABASE rt4;" | mysql -uroot -p$MYSQLPASS
   
+RUN service mysql start
+  
 RUN cd /usr/local/src \
   && curl -sSL "https://download.bestpractical.com/pub/rt/release/rt-${RT_VERSION}.tar.gz" -o rt.tar.gz \
   && echo "${RT_SHA1}  rt.tar.gz" | shasum -c \
