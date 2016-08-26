@@ -12,7 +12,7 @@ RUN apt-get update \
 	lcpanminus \
     curl \
     gcc \
-	
+###	
 	libapache-session-perl \
     libapache2-mod-fastcgi \
     libcgi-emulate-psgi-perl \
@@ -82,7 +82,7 @@ RUN apt-get update \
     perl-doc \
     starlet \
     w3m \
-	
+###	
 	libemail-abstract-perl \
     libfile-which-perl \
     liblocale-po-perl \
