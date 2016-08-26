@@ -7,6 +7,8 @@ ENV RT_SHA1 a3c7aa5398af4f53c947b4bee8c91cecd5beb432
 
 RUN sed -i "s/debian.org\/debian jessie main/debian.org\/debian jessie main contrib non-free/" /etc/apt/sources.list
 
+RUN sed -i "s/httpredir.debian.org/ftp.us.debian.org/" /etc/apt/sources.list
+
 RUN apt-get update && apt-get install -y \
 	cpanminus \
     curl \
