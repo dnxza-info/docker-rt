@@ -5,10 +5,9 @@ MAINTAINER DNX DragoN "ratthee.jar@hotmail.com"
 ENV RT_VERSION 4.4.1
 ENV RT_SHA1 a3c7aa5398af4f53c947b4bee8c91cecd5beb432
 
-RUN sed -i "s/jessie main/jessie main contrib non-free/" /etc/apt/sources.list
+RUN sed -i "s/debian jessie main/debian jessie main contrib non-free/" /etc/apt/sources.list
 
-RUN apt-get update \
-&& apt-get install -y \
+RUN apt-get update && apt-get install -y \
 	lcpanminus \
     curl \
     gcc \
