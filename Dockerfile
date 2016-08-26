@@ -114,6 +114,9 @@ RUN cpanm \
   HTML::FormatText::WithLinks::AndTables \
   Mozilla::CA
   
+RUN /usr/bin/mysqld_safe & sleep 10s \
+&& echo "CREATE DATABASE rt4;" | mysql -uroot -p$MYSQLPASS
+  
 RUN cd /usr/local/src \
   && curl -sSL "https://download.bestpractical.com/pub/rt/release/rt-${RT_VERSION}.tar.gz" -o rt.tar.gz \
   && echo "${RT_SHA1}  rt.tar.gz" | shasum -c \
@@ -126,7 +129,8 @@ RUN cd /usr/local/src \
     --enable-developer \
     --enable-gd \
     --enable-graphviz \
-    --with-db-type=SQLite \
+    --with-db-rt-user=root \
+	--with-db-rt-pass=$MYSQLPASS \
   && make install \
   && make initdb
 
