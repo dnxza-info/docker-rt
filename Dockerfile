@@ -44,11 +44,6 @@ RUN chown -R www-data:www-data /opt/rt4/var/
 COPY RT_SiteConfig.pm /opt/rt4/etc/RT_SiteConfig.pm
 RUN chown root:www-data /opt/rt4/etc/RT_SiteConfig.pm \
   && chmod 0640 /opt/rt4/etc/RT_SiteConfig.pm
-  
-# Turn on ssl
-RUN a2enmod ssl && \
- a2ensite rt && \
- apachectl configtest 
 
 VOLUME /opt/rt4
 
