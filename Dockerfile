@@ -15,7 +15,8 @@ RUN cd /usr/local/src \
   && rm rt.tar.gz \
   && cd "rt-${RT_VERSION}" \
   && /usr/bin/mysqld_safe & sleep 10s \
-  && echo "GRANT ALL PRIVILEGES ON *.* TO '$DBRTUSER'@'localhost' IDENTIFIED BY '$DBRTPASS' WITH GRANT OPTION;FLUSH PRIVILEGES;" | mysql -uroot -p$MYSQLPASS
+  && echo "DROP USER 'admin'@'%';" | mysql -uroot -p$MYSQLPASS \
+  && echo "GRANT ALL PRIVILEGES ON *.* TO '$DBRTUSER'@'localhost' IDENTIFIED BY '$DBRTPASS' WITH GRANT OPTION;FLUSH PRIVILEGES;" | mysql -uroot -p$MYSQLPASS \
   && ./configure \
     --enable-gd \
     --enable-graphviz \
