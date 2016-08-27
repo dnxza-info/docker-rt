@@ -2,6 +2,9 @@ FROM dnxza/lamp:latest
 
 MAINTAINER DNX DragoN "ratthee.jar@hotmail.com"
 
+ENV DBRT rt4
+ENV DBRTUSER rt4
+ENV DBRTPASS rtpass
 ENV RT_VERSION 4.4.1
 ENV RT_SHA1 a3c7aa5398af4f53c947b4bee8c91cecd5beb432
 
@@ -115,7 +118,8 @@ RUN cpanm \
   Mozilla::CA
   
 RUN /usr/bin/mysqld_safe & sleep 10s \
-&& echo "CREATE DATABASE rt4;" | mysql -uroot -p$MYSQLPASS
+&& echo "CREATE DATABASE $DBRT;" | mysql -uroot -p$MYSQLPASS \
+echo "GRANT ALL PRIVILEGES ON *.* TO '$DBRTUSER'@'localhost' IDENTIFIED BY '$DBRTPASS' WITH GRANT OPTION;FLUSH PRIVILEGES;" | mysql -uroot -p$MYSQLPASS
   
 RUN service mysql start
   
@@ -126,15 +130,14 @@ RUN cd /usr/local/src \
   && rm rt.tar.gz \
   && cd "rt-${RT_VERSION}" \
   && ./configure \
-    --disable-gpg \
-    --disable-smime \
-    --enable-developer \
     --enable-gd \
     --enable-graphviz \
-    --with-db-rt-user=root \
-	--with-db-rt-pass=$MYSQLPASS \
+	--with-db-database=$DBRT \
+    --with-db-rt-user=$DBRTUSER \
+	--with-db-rt-pass=$DBRTPASS \
   && make install \
-  && make initdb
+  && /usr/bin/mysqld_safe & sleep 10s \
+  && make initialize-database
 
 COPY apache.rt.conf /etc/apache2/sites-available/rt.conf
 RUN a2dissite 000-default.conf && a2ensite rt.conf
@@ -144,7 +147,14 @@ RUN chown -R www-data:www-data /opt/rt4/var/
 COPY RT_SiteConfig.pm /opt/rt4/etc/RT_SiteConfig.pm
 RUN chown root:www-data /opt/rt4/etc/RT_SiteConfig.pm \
   && chmod 0640 /opt/rt4/etc/RT_SiteConfig.pm
+  
+# Turn on ssl
+RUN a2enmod ssl fcgid && \
+ a2ensite rt && \
+ apachectl configtest 
 
 VOLUME /opt/rt4
+
+EXPOSE 443
 
 CMD [ "/bin/bash", "/start.sh", "start" ]

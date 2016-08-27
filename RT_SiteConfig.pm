@@ -1,6 +1,5 @@
 use utf8;
 
-Set($WebPort, 8080);
-Set($MailCommand, "testfile");
+Set($WebPort, 443);
 
 1;
