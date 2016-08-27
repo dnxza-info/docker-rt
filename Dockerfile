@@ -121,8 +121,6 @@ RUN /usr/bin/mysqld_safe & sleep 10s \
 && echo "CREATE DATABASE $DBRT;" | mysql -uroot -p$MYSQLPASS \
 echo "GRANT ALL PRIVILEGES ON *.* TO '$DBRTUSER'@'localhost' IDENTIFIED BY '$DBRTPASS' WITH GRANT OPTION;FLUSH PRIVILEGES;" | mysql -uroot -p$MYSQLPASS
   
-RUN service mysql start
-  
 RUN cd /usr/local/src \
   && curl -sSL "https://download.bestpractical.com/pub/rt/release/rt-${RT_VERSION}.tar.gz" -o rt.tar.gz \
   && echo "${RT_SHA1}  rt.tar.gz" | shasum -c \
