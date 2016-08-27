@@ -47,6 +47,4 @@ RUN chown root:www-data /opt/rt4/etc/RT_SiteConfig.pm \
 
 VOLUME /opt/rt4
 
-EXPOSE 443
-
 CMD [ "/bin/bash", "/start.sh", "start" ]
