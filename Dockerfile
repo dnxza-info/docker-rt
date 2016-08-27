@@ -8,23 +8,32 @@ ENV DBRTPASS rtpass
 ENV RT_VERSION 4.4.1
 ENV RT_SHA1 a3c7aa5398af4f53c947b4bee8c91cecd5beb432
   
+RUN /usr/bin/mysqld_safe & sleep 10s \
+  && echo "DROP USER 'admin'@'%';" | mysql -uroot -p$MYSQLPASS \
+  && echo "GRANT ALL PRIVILEGES ON *.* TO '$DBRTUSER'@'localhost' IDENTIFIED BY '$DBRTPASS' WITH GRANT OPTION;FLUSH PRIVILEGES;" | mysql -uroot -p$MYSQLPASS  
+  
 RUN cd /usr/local/src \
   && curl -sSL "https://download.bestpractical.com/pub/rt/release/rt-${RT_VERSION}.tar.gz" -o rt.tar.gz \
   && echo "${RT_SHA1}  rt.tar.gz" | shasum -c \
   && tar -xvzf rt.tar.gz \
-  && rm rt.tar.gz \
-  && cd "rt-${RT_VERSION}" \
-  && /usr/bin/mysqld_safe & sleep 10s \
-  && echo "DROP USER 'admin'@'%';" | mysql -uroot -p$MYSQLPASS \
-  && echo "GRANT ALL PRIVILEGES ON *.* TO '$DBRTUSER'@'localhost' IDENTIFIED BY '$DBRTPASS' WITH GRANT OPTION;FLUSH PRIVILEGES;" | mysql -uroot -p$MYSQLPASS \
-  && ./configure \
+  && rm rt.tar.gz
+
+WORKDIR /usr/local/src/rt-${RT_VERSION}
+  
+RUN ./configure \
     --enable-gd \
     --enable-graphviz \
 	--with-db-database=$DBRT \
     --with-db-rt-user=$DBRTUSER \
-	--with-db-rt-pass=$DBRTPASS \
-  && make install \
-  && /usr/bin/perl -I/opt/rt4/local/lib -I/opt/rt4/lib sbin/rt-setup-database --action init --dba-password=$MYSQLPASS
+	--with-db-rt-pass=$DBRTPASS 
+	
+RUN (echo yes;echo yes;echo o conf prerequisites_policy 'follow';echo o conf \
+ build_requires_install_policy yes;echo o conf commit)|cpan
+ 
+RUN echo N | make fixdeps && make testdeps
+
+RUN make install \
+&& /usr/bin/perl -I/opt/rt4/local/lib -I/opt/rt4/lib sbin/rt-setup-database --action init --dba-password=$MYSQLPASS
 
 COPY apache.rt.conf /etc/apache2/sites-available/rt.conf
 RUN a2dissite 000-default.conf && a2ensite rt.conf
