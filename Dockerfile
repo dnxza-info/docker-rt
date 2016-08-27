@@ -33,6 +33,7 @@ RUN (echo yes;echo yes;echo o conf prerequisites_policy 'follow';echo o conf \
 RUN echo N | make fixdeps && make testdeps
 
 RUN make install \
+&& /usr/bin/mysqld_safe & sleep 10s \
 && /usr/bin/perl -I/opt/rt4/local/lib -I/opt/rt4/lib sbin/rt-setup-database --action init --dba-password=$MYSQLPASS
 
 COPY apache.rt.conf /etc/apache2/sites-available/rt.conf
@@ -45,7 +46,7 @@ RUN chown root:www-data /opt/rt4/etc/RT_SiteConfig.pm \
   && chmod 0640 /opt/rt4/etc/RT_SiteConfig.pm
   
 # Turn on ssl
-RUN a2enmod ssl fcgid && \
+RUN a2enmod ssl && \
  a2ensite rt && \
  apachectl configtest 
 
